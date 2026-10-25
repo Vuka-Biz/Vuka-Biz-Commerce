@@ -73,7 +73,8 @@ export class FirebaseIdentity {
     const response = await fetch(`https://securetoken.googleapis.com/v1/token?key=${API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: session.refreshToken }).toString(),
+      // Built by hand: React Native's URLSearchParams doesn't accept an object.
+      body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(session.refreshToken)}`,
     });
     if (!response.ok) {
       FirebaseIdentity.session = null;

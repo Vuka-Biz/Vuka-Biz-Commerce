@@ -17,14 +17,20 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "za.co.vukabiz.app"
     },
     "web": {
       "output": "server",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
+      [
+        "expo-router",
+        {
+          "origin": "https://vuka-biz.expo.app"
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -37,6 +43,17 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "265902a5-544c-4586-8b94-4704bb7f0f72"
+      }
+    },
+    "owner": "mbuso.mulaudzi50"
   }
 }
