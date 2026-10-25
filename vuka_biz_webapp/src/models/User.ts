@@ -1,4 +1,4 @@
-export type UserRole = 'owner' | 'driver';
+export type UserRole = 'owner' | 'driver' | 'admin';
 
 export class Shop {
   constructor(

@@ -18,6 +18,8 @@ type ScreenProps = {
   scroll?: boolean;
   gap?: keyof typeof Spacing;
   stickyHeaderIndices?: number[];
+  /** Content column width; defaults to the phone column. */
+  maxWidth?: number;
 };
 
 /**
@@ -43,13 +45,13 @@ export class Screen extends Component<ScreenProps> {
   }
 
   render() {
-    const { header, children, overlay, inTabs, scroll = true, gap = 'md', stickyHeaderIndices } = this.props;
+    const { header, children, overlay, inTabs, scroll = true, gap = 'md', stickyHeaderIndices, maxWidth } = this.props;
     const bottomPad = (inTabs ? 0 : this.insets.bottom) + Spacing.xl;
-    const content = <View style={[styles.column, { gap: Spacing[gap] }]}>{children}</View>;
+    const content = <View style={[styles.column, { gap: Spacing[gap] }, maxWidth ? { maxWidth } : null]}>{children}</View>;
 
     return (
       <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {header && <AppHeader {...header} topInset={this.insets.top} />}
+        {header && <AppHeader maxWidth={maxWidth} {...header} topInset={this.insets.top} />}
         {scroll ? (
           <ScrollView
             style={styles.root}

@@ -42,6 +42,7 @@ export class MockDatabase {
   static readonly users: readonly User[] = [
     new User('u-owner', 'Thandi Mokoena', '0712345678', 'owner', MockDatabase.shop),
     new User('u-driver', 'Sipho Mahlangu', '0823456789', 'driver', MockDatabase.shop),
+    new User('u-admin', 'Vuka Support', '0601234567', 'admin', new Shop('Vuka Biz HQ', 'Johannesburg', 'October 2026')),
   ];
 
   static readonly demoPin = '1234';

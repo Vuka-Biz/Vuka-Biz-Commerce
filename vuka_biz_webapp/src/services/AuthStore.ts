@@ -34,7 +34,8 @@ export class AuthStore extends ObservableStore<AuthState> {
 
     const result = await FirebaseIdentity.signIn(AuthStore.normalisePhone(phone), pin);
     if (!result.ok) return result;
-    if (result.role !== role) {
+    // Support staff can sign in from either toggle; owners and drivers must match it.
+    if (result.role !== 'admin' && result.role !== role) {
       FirebaseIdentity.signOut();
       return { ok: false, error: `This number is registered as a ${result.role === 'driver' ? 'driver' : 'spaza owner'}. Switch the toggle above.` };
     }

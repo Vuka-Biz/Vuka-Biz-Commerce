@@ -139,7 +139,7 @@ export default function LoginScreen() {
           <View style={styles.demo}>
             <UI.Icon name="help" size={18} color={Palette.accentBright} />
             <UI.Text variant="bodySm" color="brandMuted" style={{ flex: 1 }}>
-              Demo: owner 071 234 5678 • driver 082 345 6789 • PIN{' '}
+              Demo: owner 071 234 5678 • driver 082 345 6789 • support 060 123 4567 • PIN{' '}
               <UI.Text variant="bodyStrong" color="accentBright" style={{ fontSize: 12 }}>
                 {MockDatabase.demoPin}
               </UI.Text>

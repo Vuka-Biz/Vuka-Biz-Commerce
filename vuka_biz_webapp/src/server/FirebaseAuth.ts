@@ -90,7 +90,7 @@ export class FirebaseAuth {
 
     return {
       uid: claims.sub!,
-      role: claims.role === 'driver' ? 'driver' : 'owner',
+      role: claims.role === 'driver' || claims.role === 'admin' ? claims.role : 'owner',
       name: typeof claims.name === 'string' ? claims.name.slice(0, 80) : undefined,
       phone: claims.phone_number,
     };

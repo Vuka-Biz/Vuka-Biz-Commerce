@@ -103,4 +103,7 @@ export const Shadow = {
 /** Content never stretches wider than a phone on web/tablets. */
 export const MaxContentWidth = 560;
 
+/** Desktop tools such as the support console. */
+export const WideContentWidth = 1120;
+
 export const isWeb = Platform.OS === 'web';

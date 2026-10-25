@@ -1,3 +1,4 @@
+import { AttentionCard, KpiRow, OrderDetail, OrdersTable, StatusBadge } from './admin';
 import { CreditScoreCard, FundingChecklist, ProfileCard, StatTile, TradePulseCard, WeeklyFlowChart } from './books';
 import { BrandMark } from './brand';
 import {
@@ -54,4 +55,10 @@ export const Vuka = {
   ShiftCard,
   RouteOfferCard,
   CargoBatchCard,
+  // Support console
+  KpiRow,
+  AttentionCard,
+  OrdersTable,
+  OrderDetail,
+  StatusBadge,
 } as const;

@@ -21,7 +21,8 @@ const navigationTheme = {
  *   welcome  → splash + welcome          (signed out)
  *   login    → phone + PIN login         (signed out)
  *   (tabs)   → Shop · Safe · Orders · Books · Driver   (signed in)
- *   checkout → cart checkout, pushed over the tabs     (signed in)
+ *   checkout → cart checkout, pushed over the tabs     (owners & drivers)
+ *   admin    → support console                         (support staff)
  */
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -47,9 +48,12 @@ export default function RootLayout() {
           <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
           <Stack.Screen name="login" options={{ animation: 'slide_from_right' }} />
         </Stack.Protected>
-        <Stack.Protected guard={!!user}>
+        <Stack.Protected guard={!!user && user.role !== 'admin'}>
           <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
           <Stack.Screen name="checkout" options={{ animation: 'slide_from_bottom' }} />
+        </Stack.Protected>
+        <Stack.Protected guard={user?.role === 'admin'}>
+          <Stack.Screen name="admin" options={{ animation: 'fade' }} />
         </Stack.Protected>
       </Stack>
     </ThemeProvider>

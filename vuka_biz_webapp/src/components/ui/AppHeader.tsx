@@ -16,6 +16,8 @@ export type AppHeaderProps = {
   actions?: readonly HeaderAction[];
   avatarInitials?: string;
   topInset?: number;
+  /** Content column width; defaults to the phone column. */
+  maxWidth?: number;
 };
 
 /** Dark brand bar used at the top of every signed-in screen. */
@@ -42,10 +44,10 @@ export class AppHeader extends PureComponent<AppHeaderProps> {
   }
 
   render() {
-    const { title, eyebrow = 'VUKA BIZ', actions = [], avatarInitials, topInset = 0, onBack } = this.props;
+    const { title, eyebrow = 'VUKA BIZ', actions = [], avatarInitials, topInset = 0, onBack, maxWidth = MaxContentWidth } = this.props;
     return (
       <View style={[styles.bar, { paddingTop: topInset }]}>
-        <View style={styles.inner}>
+        <View style={[styles.inner, { maxWidth: maxWidth + Spacing.gutter * 2 }]}>
           {this.renderLeading()}
           <View style={styles.titles}>
             {!onBack && (
@@ -91,8 +93,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     paddingHorizontal: Spacing.gutter,
     width: '100%',
-    // Same edges as the Screen content column (column width + its side gutters).
-    maxWidth: MaxContentWidth + Spacing.gutter * 2,
+    // maxWidth is set inline: same edges as the Screen content column plus its side gutters.
     alignSelf: 'center',
   },
   brandTile: {

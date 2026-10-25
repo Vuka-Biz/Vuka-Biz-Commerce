@@ -8,7 +8,7 @@
  * 1. Creates the Firestore database (africa-south1, Johannesburg) if missing
  * 2. Deploys firestore.rules (no direct client access)
  * 3. Enables Email/Password sign-in (phone + PIN logins map onto it)
- * 4. Creates the demo owner and driver accounts with their role claims
+ * 4. Creates the demo owner, driver and support (admin) accounts with their role claims
  */
 import { readFileSync } from 'node:fs';
 import { cert, initializeApp } from 'firebase-admin/app';
@@ -20,6 +20,7 @@ const DEMO_PIN = '1234';
 const DEMO_USERS = [
   { phone: '0712345678', name: 'Thandi Mokoena', role: 'owner' },
   { phone: '0823456789', name: 'Sipho Mahlangu', role: 'driver' },
+  { phone: '0601234567', name: 'Vuka Support', role: 'admin' },
 ];
 
 /** Must match src/services/FirebaseIdentity.ts. */

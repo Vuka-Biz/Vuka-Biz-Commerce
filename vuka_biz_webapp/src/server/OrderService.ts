@@ -1,5 +1,5 @@
 import { MockDatabase } from '@/data/MockDatabase';
-import { type ApiOrder, Cart, CheckoutQuote, type PaymentMethodId } from '@/models';
+import { type ApiAuditEntry, type ApiOrder, Cart, CheckoutQuote, type PaymentMethodId } from '@/models';
 
 import type { AuthUser } from './FirebaseAuth';
 import { ServerConfig } from './config';
@@ -14,6 +14,8 @@ export interface OrderRepository {
   get(id: string): Promise<OrderRecord | undefined>;
   listByOwner(ownerUid: string): Promise<OrderRecord[]>;
   listOpen(): Promise<OrderRecord[]>;
+  /** Newest first, capped. Support console only. */
+  listAll(limit: number): Promise<OrderRecord[]>;
   update(order: OrderRecord): Promise<void>;
 }
 
@@ -35,6 +37,13 @@ export class InMemoryOrderRepository implements OrderRepository {
 
   async listOpen() {
     return [...this.orders.values()].filter((o) => o.status === 'placed').map((o) => structuredClone(o));
+  }
+
+  async listAll(limit: number) {
+    return [...this.orders.values()]
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, limit)
+      .map((o) => structuredClone(o));
   }
 
   async update(order: OrderRecord) {
@@ -137,6 +146,7 @@ export class OrderService {
       failedPinAttempts: 0,
       status: 'placed',
       createdAt: new Date().toISOString(),
+      audit: [{ at: new Date().toISOString(), by: user.uid, action: 'placed' }],
     };
     await this.repository.create(order);
     return order;
@@ -158,7 +168,11 @@ export class OrderService {
 
     if (!constantTimeEquals(pin, order.handoverPin)) {
       order.failedPinAttempts += 1;
-      if (order.failedPinAttempts >= ServerConfig.maxPinAttempts) order.status = 'locked';
+      OrderService.log(order, user, 'wrong_pin');
+      if (order.failedPinAttempts >= ServerConfig.maxPinAttempts) {
+        order.status = 'locked';
+        OrderService.log(order, user, 'locked');
+      }
       await this.repository.update(order);
       const left = ServerConfig.maxPinAttempts - order.failedPinAttempts;
       throw left > 0
@@ -168,8 +182,38 @@ export class OrderService {
 
     order.status = 'delivered';
     order.deliveredAt = new Date().toISOString();
+    OrderService.log(order, user, 'delivered');
     await this.repository.update(order);
     return OrderService.withoutPin(order);
+  }
+
+  /** Support console: every order, newest first. PINs are never shown, even to staff. */
+  async listAll(user: AuthUser): Promise<ApiOrder[]> {
+    if (user.role !== 'admin') throw new ApiError(403, 'Support staff only.');
+    return (await this.repository.listAll(200)).map(OrderService.withoutPin);
+  }
+
+  /**
+   * Support verified the delivery with the shop (e.g. by phone): reopen a locked
+   * order with a fresh PIN, since the old one may have been partly guessed.
+   */
+  async unlock(user: AuthUser, id: string): Promise<ApiOrder> {
+    if (user.role !== 'admin') throw new ApiError(403, 'Support staff only.');
+    const order = await this.repository.get(id);
+    if (!order) throw new ApiError(404, 'Order not found.');
+    if (order.status !== 'locked') throw new ApiError(409, 'Only locked orders can be unlocked.');
+
+    order.status = 'placed';
+    order.failedPinAttempts = 0;
+    order.handoverPin = randomDigits(4);
+    OrderService.log(order, user, 'unlocked');
+    await this.repository.update(order);
+    return OrderService.withoutPin(order);
+  }
+
+  private static log(order: OrderRecord, user: AuthUser, action: ApiAuditEntry['action']): void {
+    // Older records may predate the audit trail.
+    order.audit = [...(order.audit ?? []), { at: new Date().toISOString(), by: user.uid, action }];
   }
 
   private static withoutPin(order: OrderRecord): ApiOrder {

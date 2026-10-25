@@ -29,6 +29,14 @@ export class ApiClient {
     return ApiClient.request('POST', `/api/orders/${encodeURIComponent(orderId)}/handover`, { pin });
   }
 
+  static adminListOrders(): Promise<{ orders: ApiOrder[] }> {
+    return ApiClient.request('GET', '/api/admin/orders');
+  }
+
+  static unlockOrder(orderId: string): Promise<{ order: ApiOrder }> {
+    return ApiClient.request('POST', `/api/admin/orders/${encodeURIComponent(orderId)}/unlock`);
+  }
+
   private static async request<T>(method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
     const token = await FirebaseIdentity.idToken();
     if (!token) throw new ApiRequestError(401, 'Your session has expired. Log in again.');

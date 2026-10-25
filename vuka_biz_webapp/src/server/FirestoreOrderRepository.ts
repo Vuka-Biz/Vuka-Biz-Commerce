@@ -84,6 +84,17 @@ export class FirestoreOrderRepository implements OrderRepository {
     return this.query('status', 'placed');
   }
 
+  async listAll(limit: number): Promise<OrderRecord[]> {
+    const rows = await this.request<{ document?: FirestoreDocument }[]>('POST', `${this.documentsUrl}:runQuery`, {
+      structuredQuery: {
+        from: [{ collectionId: FirestoreOrderRepository.COLLECTION }],
+        orderBy: [{ field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' }],
+        limit,
+      },
+    });
+    return (rows ?? []).flatMap((row) => (row.document ? [this.toRecord(row.document)] : []));
+  }
+
   /** Fails with 409 if the order changed since it was read (e.g. two PIN attempts at once). */
   async update(order: OrderRecord): Promise<void> {
     const version = this.versions.get(order);

@@ -92,7 +92,7 @@ export class FirebaseIdentity {
       idToken,
       refreshToken,
       expiresAt: Date.now() + expiresInSeconds * 1000,
-      role: claims.role === 'driver' ? 'driver' : 'owner',
+      role: claims.role === 'driver' || claims.role === 'admin' ? claims.role : 'owner',
       name: claims.name,
     };
   }

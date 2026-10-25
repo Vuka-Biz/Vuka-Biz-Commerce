@@ -32,7 +32,11 @@ export class OrderStore extends ObservableStore<OrderState> {
 
   private constructor() {
     super(EMPTY);
-    const sync = () => (AuthStore.instance.getSnapshot().user ? this.start() : this.stop());
+    // Support staff use AdminStore instead.
+    const sync = () => {
+      const user = AuthStore.instance.getSnapshot().user;
+      return user && user.role !== 'admin' ? this.start() : this.stop();
+    };
     AuthStore.instance.subscribe(sync);
     // Screens import this lazily, possibly after sign-in already happened.
     sync();
