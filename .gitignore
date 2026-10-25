@@ -1,0 +1,17 @@
+# IDE
+.idea/
+*.iml
+
+# Secrets – repo-wide safety net (vuka_biz_webapp/.gitignore has the app-specific rules)
+*firebase-adminsdk*.json
+service-account*.json
+.env*.local
+*.pem
+*.p8
+*.p12
+*.jks
+*.key
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,12 @@
+rules_version = '2';
+
+// Clients never touch Firestore directly. Every read and write goes through the
+// Vuka Biz API (src/app/api), which verifies the Firebase ID token, rate-limits,
+// validates input and computes prices server-side, then uses the Admin credentials.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
